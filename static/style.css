@@ -1,0 +1,754 @@
+body {
+    margin: 0;
+    overflow: hidden;
+    font-family: 'Mali';
+    box-sizing: border-box;
+    position: relative;
+}
+
+#toolbar {
+    position: fixed;
+    top: 10px;
+    left: 10px;
+    padding: 0px 10px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+    z-index: 10;
+    display: flex;
+    gap: 4px;
+    background-color: #666666;
+}
+
+#toolbar button {
+    border-radius: 3px;
+    font-size: 14px;
+    color: white;
+    border: none;
+    background-color: transparent;
+    padding: 4px 6px;
+}
+
+#toolbar button:hover {
+    background-color: #444444;
+}
+
+#toolbar .break {
+    height: 70%;
+    width: 2px;
+    border-radius: 1px;
+    background-color: #999999;
+}
+
+#viewer {
+    display: none;
+    opacity: 1;
+}
+
+#viewer.show {
+    display: none; 
+}
+
+.canvasGroup {
+    width: 100vw;
+    height: 100vh;
+    position: relative;
+}
+
+.canvas {
+    display: block;
+    touch-action: none; 
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    cursor: default;
+}
+
+#liveCanvas {
+    z-index: 3; 
+}
+#drawCanvas {
+    z-index: 2;
+}
+#backgroundCanvas {
+    z-index: 1;
+    pointer-events: none; /* Prevent interaction with the background canvas */
+}
+
+#scaleIndicator {
+    color: #ffffff;
+    padding: 4px 6px;
+    font-size: 14px;
+    font-weight: 500;
+    border-radius: 6px;
+    z-index: 10;
+    user-select: none;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+#scaleIndicator:hover {
+    background-color: #444444;
+}
+
+/* ------------tool box style -------------- */
+.penTools {
+    position: absolute;
+    top: 220px;
+    right: 300px;
+    width: 80px;
+    height: 300px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+    opacity: 0;
+    z-index: 77777;
+}
+.penTools.show {
+    opacity: 1;
+    pointer-events: auto;
+}
+.penTools.show .nav-content span {
+    pointer-events: auto; /* 🔥 Allow interaction with icons */
+}
+.nav-content span a {
+    transition: background-color 0.3s ease, transform 0.3s ease;
+}
+.nav-content span a:hover {
+    background-color: lightblue;
+    transform: scale(1.1) rotate(45deg) ; /* 🔥 Optional: scale up on hover */
+    color: white; /* 🔥 Optional: change text/icon color */
+}
+.nav-content span a.hovered {
+    background-color: lightblue;
+    transform: scale(1.1) rotate(45deg);
+    color: white;
+}
+.penTools .nav-content {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transform: rotate(-45deg);
+}
+.nav-content .toggle-btn,
+.nav-content span a {
+    height: 50px;
+    width: 50px;
+    background: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+}
+.nav-content .toggle-btn {
+    font-size: 35px;
+    color: #0e2431;
+    z-index: 100;
+    cursor: pointer;
+    transform: rotate(-225deg);
+    transition: all 0.3s ease;
+    opacity: 1;
+    /* Default visible */
+}
+.nav-content .toggle-btn {
+    transition: background-color 0.7s ease;
+}
+.nav-content .toggle-btn.hidden {
+    opacity: 0;
+    /* Hidden when closed */
+    pointer-events: none;
+    /* Prevent interaction */
+}
+.nav-content .toggle-btn.countdown {
+    background-color: #333333;
+}
+
+
+.penTools.open .toggle-btn {
+    transform: rotate(0deg);
+}
+.nav-content span {
+    position: absolute;
+    transition: all 0.3s ease;
+    opacity: 0;
+}
+.penTools.open .nav-content span {
+    transform: rotate(calc(var(--i) * (360deg/8))) translateY(90px);
+    opacity: 1;
+}
+.nav-content span a {
+    text-decoration: none;
+    transform: rotate(45deg);
+}
+.nav-content span a i {
+    font-size: 24px;
+    color: #0e2431;
+    transform: rotate(calc(var(--i) * (360deg/ -8)));
+    opacity: 0.8;
+    transition: 0.1s;
+    /* for label */
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: column;
+    justify-content: center;
+}
+.nav-content span a i::after {
+    content: attr(data-label);
+    position: absolute;
+    bottom: -30px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 14px;
+    color: white;
+    background-color: 'rgba(32,31,30, 0.7)';
+    padding: 2px 5px;
+    border-radius: 3px;
+    white-space: nowrap;
+}
+.nav-content span a:hover i {
+    opacity: 1;
+}
+
+
+/* ------------note navbar style -------------- */
+#openNavBtn {
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    z-index: 1001;
+    padding: 0px 10px;
+    height: 36px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #666666;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+#openSettingBtn {
+    position: fixed;
+    top: 20px;
+    right: 110px;
+    z-index: 1001;
+    padding: 9px 10px; 
+    background-color: #666666;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#notenavbar {
+    position: fixed;
+    top: 0;
+    right: -100%;
+    /* right: 0; */
+    width: 500px;
+    height: 100vh;
+    background: #ffffff;
+    box-shadow: -4px 0 10px rgba(0, 0, 0, 0.1);
+    border-left: 1px solid #e0e0e0;
+    z-index: 1000;
+    transition: right 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    padding: 10px;
+}
+
+#notenavbar.open {
+    right: 0;
+}
+.buttonGroup {
+    width: 430px;
+    display: flex;
+    flex-direction: row;
+    margin-bottom: 10px;
+}
+.buttonGroup #driveGroup{
+    display: flex;
+    flex-direction: row;
+    gap: 4px;
+    width: 340px;
+}
+.buttonGroup #functionGroup{
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    gap: 4px;
+    width: 90px;
+}
+.buttonGroup button {
+    background-color: whitesmoke;
+    color: black;
+    border: 2px lightgray solid;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    height: 36px;
+}
+#functionGroup button{
+    width: 39px;
+    margin: 0;
+    padding: 0;
+    border: 0px;
+    display: flex;
+    color: white;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background-color: #666666;
+}
+#driveGroup button{
+    width: 164px;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+
+
+#notenavbar .shelf {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    margin-bottom: 10px;
+    padding: 0;
+    margin: 0;
+}
+.shelf .folder {
+    width: 160px;
+    height: 100%;
+    gap: 0px;
+    display: flex;
+    flex-direction: column;
+    gap: 0px;
+}
+.shelf .folder-button {
+    background-color: #666666;
+    width: 100%;
+    height: 36px;
+    margin: 0;
+    font-size: 14px;
+    border: solid 2px #444444;
+    border-radius: 6px;
+    box-sizing: border-box;
+    margin-bottom: -2px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.shelf .folder-button::after {
+  content: "";
+  width: 12px;             /* diameter of the circle */
+  height: 12px;
+  background-color: #ffffff; /* or any color */
+  border-radius: 50%;       /* distance from the edge to the circle's edge */
+  flex-shrink: 0;
+}
+
+.shelf .folder-button:hover p{
+    color: black;
+    background-color: #e0e8ff;
+}
+.folder-button.selected p{
+    color: black;
+    background-color: #e0e8ff;
+}
+.folder-button p {
+    width: 122px;
+    height: 64%;
+    display: flex;
+    justify-content: center;
+    font-family: 'Mali';
+    align-items: center;
+    background-color: #f5f5f5;
+    border-radius: 8px;
+}
+.folder i{
+    font-size: 20px;
+    color: white;
+}
+.shelf .notes {
+    width: 330px;
+    height: 97%;
+    margin-right: 8px;
+    border: #d3d3d3 solid 2px;
+    border-radius: 6px;
+    display: flex;
+    flex-direction: column;
+    justify-content: start;
+    align-items: center;
+}
+.notes #menubar {
+    margin: 10px 0;
+    width: 90%;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+    gap: 4px;
+    background-color: #666666;
+}
+#menubar button {
+    border-radius: 3px;
+    font-size: 14px;
+    color: white;
+    border: none;
+    background-color: transparent;
+    padding: 4px 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+#menubar button:hover {
+    background-color: #444444;
+}
+#menubar .break {
+    height: 70%;
+    width: 2px;
+    border-radius: 1px;
+    background-color: #999999;
+}
+
+#note-list {
+    width: 90%;
+    overflow-y: auto;
+}
+#note-list button:hover {
+    background-color: #e0e8ff;
+}
+
+/* Button in button (action for each) note */
+.note-button {
+    position: relative;
+    padding: 5px 5px;
+    width: 100%;
+    font-size: 14px;
+    position: relative;
+    z-index: 1;
+    text-align: left;
+    white-space: nowrap;
+    overflow: hidden;
+    margin: 0;
+    background-color: transparent;
+    border: none;
+    font-family: 'Mali';
+    border-radius: 6px;
+    /* border: 2px lightgray dashed; */
+}
+.note-button.noteSelected {
+    background-color: #e0e8ff;
+    border: #d3d3d3 solid 2px;
+}
+.note-button::after {
+    position: absolute;
+    content: "....................................................................................................................................................";
+    flex-grow: 1;
+    margin-left: 2px;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: clip;
+}
+
+.subnote-container {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: end; 
+    position: relative;
+    padding: 0;
+    margin: 0;
+}
+
+.delete-button,
+.new-button {
+    position: absolute;
+    background: transparent;
+    border-radius: 2px;
+    height: fit-content;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+    z-index: 2;
+    color: black
+}
+
+.subnote-container .delete-button {
+    position: absolute;
+    top: 2px;
+    right: 0px;
+}
+
+.folder-container .new-button {
+    top: 10px;
+    right: 4px;
+    font-size: 20px;
+}
+
+.subfolder-note {
+    background-color: #ffe8a1;
+    font-style: italic;
+    font-size: 0.9em;
+}
+.subfolder-note-list {
+    margin-left: 1.5em;
+    border-left: 2px dashed #ccc;
+    padding-left: 1em;
+}
+
+.folder-btn {
+    font-size: 20px;
+    font-weight: bold;
+    background-color: white;
+    text-align: left;
+    border: none;
+    border-bottom: 2px solid gray;
+}
+.folder-btn i {
+    transition: all 0.3s;
+}
+
+.hidden {
+    display: none;
+}
+.settings-wrapper.show {
+    display: block;
+}
+button#export {
+    margin-bottom: 30px;
+}
+
+/* -----------------Setting page------------------------------ */
+.settings-wrapper {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    max-width: 1280px;
+    width: 80vw;
+    margin: 30px auto;
+    margin-top: 60px;
+    padding: 30px;
+    background-color: #3a3a3a;
+    border-radius: 20px;
+    height: 80vh;
+    overflow: auto;
+    z-index: 1000;
+    color: #f1f1f1;
+    display: none;
+}
+
+.settings-wrapper::-webkit-scrollbar {
+    width: 10px;
+}
+
+.settings-wrapper::-webkit-scrollbar-track {
+    background: transparent;  /* Transparent track (background) */
+}
+
+.settings-wrapper::-webkit-scrollbar-thumb {
+    background-color: rgba(150, 150, 150, 0.5); /* Thumb with opacity */
+    border-radius: 8px;
+    border: 2px solid transparent; /* Adds spacing for thumb edge */
+    background-clip: padding-box;
+}
+
+h2 {
+    font-size: 1.5rem;
+    margin-bottom: 20px;
+    color: #fff;
+}
+
+label {
+    display: block;
+    font-size: 0.95rem;
+    margin-bottom: 6px;
+}
+
+select,
+input[type="color"],
+input[type="range"] {
+    width: 100%;
+    padding: 5px;
+    background-color: #444;
+    border: 1px solid #666;
+    color: #fff;
+    border-radius: 6px;
+    max-width: 350px;
+}
+
+.grid-section,
+.modifier-section {
+    margin-bottom: 40px;
+}
+
+.grid-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    align-items: center;
+}
+
+.grid-section label {
+    margin-top: 15px;
+}
+
+.grid-style-options button {
+    background-color: #444;
+    color: #fff;
+    padding: 6px 12px;
+    border: 1px solid #777;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.grid-style-options button.active {
+    background-color: #666;
+}
+
+.range-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.range-row span {
+    font-size: 0.9rem;
+}
+
+.modifier-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, 300px); 
+    gap: 20px;
+    justify-content: center;
+}
+
+.modifier-card {
+    background-color: #2b2b2b;
+    border-radius: 16px;
+    padding: 16px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.4);
+    position: relative;
+}
+
+.modifier-title {
+    font-weight: bold;
+    margin-bottom: 12px;
+}
+
+.toggle-switch {
+    position: relative;
+    width: 40px;
+    height: 22px;
+}
+
+.toggle-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0; left: 0;
+    right: 0; bottom: 0;
+    background-color: #555;
+    border-radius: 22px;
+    transition: 0.3s;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 16px;
+    width: 16px;
+    left: 3px;
+    bottom: 3px;
+    background-color: white;
+    transition: .4s;
+    border-radius: 50%;
+}
+
+.toggle-switch input:checked + .slider {
+    background-color: #2196F3;
+}
+
+.toggle-switch input:checked + .slider:before {
+    transform: translateX(18px);
+}
+
+.modifier-footer {
+    margin-top: 10px;
+}
+
+/* ----------scroll bar ---------------- */
+#scrollbar {
+    position: absolute;
+    right: 5px;
+    top: 0;
+    height: 86vh;
+    width: 8px;
+    margin-top: 7vh;
+    background: #eee;
+    border-radius: 4px;
+    z-index: 10000;
+    display: "none";
+}
+#thumb {
+    width: 100%;
+    height: 0px;
+    background: #888;
+    border-radius: 4px;
+    position: absolute;
+    top: 0;
+}
+
+/* -------------------Toc button ------------- */
+#tocDropdown {
+  position: absolute;
+  top: 48px; 
+  left: 10px; 
+  max-width: 50vw;
+  max-height: 50vh;
+  overflow-x: auto;
+  background: #1e1e1e;
+  color: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.35);
+  display: none;
+  z-index: 9999;
+}
+
+#tocDropdown div {
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+#tocDropdown div:hover {
+  background: rgba(255,255,255,0.15);
+}

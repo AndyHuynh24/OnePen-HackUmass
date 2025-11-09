@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Image → LaTeX → Math Solver Demo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      margin: 0;
+      padding: 0;
+      background: #f3f4f6;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      min-height: 100vh;
+    }
+
+    .container {
+      background: #ffffff;
+      margin: 24px;
+      padding: 24px;
+      border-radius: 12px;
+      max-width: 900px;
+      width: 100%;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+    }
+
+    h1 {
+      margin-top: 0;
+      font-size: 1.8rem;
+      text-align: center;
+    }
+
+    p.description {
+      text-align: center;
+      color: #4b5563;
+      margin-top: 4px;
+      margin-bottom: 20px;
+    }
+
+    .flex {
+      display: flex;
+      gap: 24px;
+      flex-wrap: wrap;
+    }
+
+    .panel {
+      flex: 1 1 260px;
+      min-width: 260px;
+    }
+
+    .panel h2 {
+      font-size: 1.1rem;
+      margin-bottom: 8px;
+    }
+
+    .card {
+      background: #f9fafb;
+      border-radius: 10px;
+      padding: 16px;
+      border: 1px solid #e5e7eb;
+    }
+
+    .file-input {
+      margin-bottom: 12px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 8px 14px;
+      border-radius: 999px;
+      border: none;
+      cursor: pointer;
+      font-size: 0.95rem;
+      font-weight: 500;
+      background: #2563eb;
+      color: #fff;
+      transition: transform 0.05s ease, box-shadow 0.05s ease, background 0.15s;
+    }
+
+    .btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      box-shadow: none;
+      transform: none;
+    }
+
+    .btn:hover:not(:disabled) {
+      background: #1d4ed8;
+      box-shadow: 0 4px 10px rgba(37, 99, 235, 0.25);
+      transform: translateY(-1px);
+    }
+
+    .btn-secondary {
+      background: #111827;
+      color: #f9fafb;
+    }
+
+    .btn-secondary:hover:not(:disabled) {
+      background: #020617;
+    }
+
+    .btn-sm {
+      padding: 5px 10px;
+      font-size: 0.85rem;
+      border-radius: 999px;
+    }
+
+    .img-preview {
+      max-width: 100%;
+      border-radius: 8px;
+      border: 1px solid #e5e7eb;
+      display: block;
+      margin-top: 10px;
+    }
+
+    .status {
+      margin-top: 10px;
+      font-size: 0.9rem;
+      color: #4b5563;
+    }
+
+    .status.error {
+      color: #b91c1c;
+    }
+
+    .field-label {
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      color: #6b7280;
+      letter-spacing: 0.03em;
+      margin-bottom: 4px;
+    }
+
+    .mono {
+      font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco,
+        Consolas, "Liberation Mono", "Courier New", monospace;
+      font-size: 0.9rem;
+      background: #111827;
+      color: #e5e7eb;
+      padding: 10px;
+      border-radius: 8px;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    .result-box {
+      background: #ecfdf5;
+      border-radius: 8px;
+      padding: 10px;
+      border: 1px solid #6ee7b7;
+      font-size: 0.95rem;
+    }
+
+    .row {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 6px;
+      flex-wrap: wrap;
+    }
+
+    .row input[type="text"] {
+      flex: 1;
+      min-width: 120px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid #d1d5db;
+      font-size: 0.85rem;
+    }
+
+    .row input[type="text"]:focus {
+      outline: none;
+      border-color: #2563eb;
+      box-shadow: 0 0 0 1px rgba(37, 99, 235, 0.3);
+    }
+
+    .small-text {
+      font-size: 0.8rem;
+      color: #6b7280;
+      margin-top: 4px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Image → LaTeX → Math Solver</h1>
+    <p class="description">
+      Upload a math snapshot. Your Flask backend will use <strong>Pix2Text</strong> to read LaTeX,
+      then <strong>SymPy</strong> will try to solve/simplify it.
+    </p>
+
+    <div class="flex">
+      <!-- Upload / Preview panel -->
+      <div class="panel">
+        <h2>1. Upload Image</h2>
+        <div class="card">
+          <input class="file-input" type="file" id="imageInput" accept="image/*" />
+
+          <button class="btn" id="runBtn">Recognize &amp; Solve</button>
+
+          <div id="status" class="status"></div>
+
+          <img id="preview" class="img-preview" style="display: none;" alt="Preview" />
+        </div>
+      </div>
+
+      <!-- Output panel -->
+      <div class="panel">
+        <h2>2. Output</h2>
+        <div class="card">
+          <div class="row">
+            <div class="field-label">Recognized LaTeX</div>
+            <button id="copyLatexBtn" class="btn btn-sm btn-secondary" disabled>Copy</button>
+          </div>
+          <div id="latexBox" class="mono">– no LaTeX yet –</div>
+
+          <div style="height: 12px;"></div>
+
+          <div class="field-label">SymPy Result</div>
+          <div id="resultBox" class="result-box">– no result yet –</div>
+
+          <div style="height: 16px;"></div>
+
+          <div class="field-label">Save as JSON</div>
+          <div class="row">
+            <input
+              type="text"
+              id="filenameInput"
+              placeholder="Filename (without .json), e.g. note_1"
+            />
+            <button id="saveBtn" class="btn btn-sm" disabled>Save</button>
+          </div>
+          <div class="small-text">
+            This sends a POST to <code>/save_json</code> with <code>{"filename", "latex", "result"}</code>.
+          </div>
+          <div id="saveStatus" class="status"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const imageInput = document.getElementById("imageInput");
+    const preview = document.getElementById("preview");
+    const statusEl = document.getElementById("status");
+    const latexBox = document.getElementById("latexBox");
+    const resultBox = document.getElementById("resultBox");
+    const runBtn = document.getElementById("runBtn");
+    const copyLatexBtn = document.getElementById("copyLatexBtn");
+    const saveBtn = document.getElementById("saveBtn");
+    const filenameInput = document.getElementById("filenameInput");
+    const saveStatus = document.getElementById("saveStatus");
+
+    let lastLatex = null;
+    let lastResult = null;
+
+    // Preview selected image
+    imageInput.addEventListener("change", () => {
+      const file = imageInput.files[0];
+      if (!file) {
+        preview.style.display = "none";
+        return;
+      }
+      const url = URL.createObjectURL(file);
+      preview.src = url;
+      preview.style.display = "block";
+    });
+
+    // Recognize & solve
+    runBtn.addEventListener("click", async () => {
+      const file = imageInput.files[0];
+      if (!file) {
+        alert("Please choose an image first.");
+        return;
+      }
+
+      statusEl.textContent = "Processing image with Pix2Text + SymPy…";
+      statusEl.classList.remove("error");
+      runBtn.disabled = true;
+      saveBtn.disabled = true;
+      copyLatexBtn.disabled = true;
+      saveStatus.textContent = "";
+
+      const formData = new FormData();
+      formData.append("image", file);
+
+      try {
+        const res = await fetch("/predict", {
+          method: "POST",
+          body: formData,
+        });
+
+        const data = await res.json();
+
+        if (!res.ok) {
+          statusEl.textContent = data.error || "Server error.";
+          statusEl.classList.add("error");
+          runBtn.disabled = false;
+          return;
+        }
+
+        console.log("Response from /predict:", data);
+
+        lastLatex = data.latex ?? "";
+        lastResult = data.result ?? "";
+
+        latexBox.textContent = lastLatex || "– empty –";
+        resultBox.textContent = lastResult || "– empty –";
+
+        statusEl.textContent = "✅ Done!";
+        statusEl.classList.remove("error");
+
+        copyLatexBtn.disabled = !lastLatex;
+        saveBtn.disabled = false;
+      } catch (err) {
+        console.error(err);
+        statusEl.textContent = "Network error or server not running.";
+        statusEl.classList.add("error");
+      } finally {
+        runBtn.disabled = false;
+      }
+    });
+
+    // Copy LaTeX to clipboard
+    copyLatexBtn.addEventListener("click", async () => {
+      if (!lastLatex) return;
+      try {
+        await navigator.clipboard.writeText(lastLatex);
+        statusEl.textContent = "📋 LaTeX copied to clipboard.";
+        statusEl.classList.remove("error");
+      } catch (err) {
+        console.error(err);
+        statusEl.textContent = "Failed to copy LaTeX.";
+        statusEl.classList.add("error");
+      }
+    });
+
+    // Save JSON to backend
+    saveBtn.addEventListener("click", async () => {
+      if (!lastLatex && !lastResult) {
+        alert("Nothing to save yet. Run a prediction first.");
+        return;
+      }
+
+      const filename = filenameInput.value.trim() || "data";
+
+      const payload = {
+        filename: filename,
+        latex: lastLatex,
+        result: lastResult,
+        timestamp: new Date().toISOString(),
+      };
+
+      saveStatus.textContent = "Saving JSON…";
+      saveStatus.classList.remove("error");
+      saveBtn.disabled = true;
+
+      try {
+        const res = await fetch("/save_json", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(payload),
+        });
+
+        const data = await res.json();
+
+        if (!res.ok) {
+          saveStatus.textContent = data.error || "Failed to save file.";
+          saveStatus.classList.add("error");
+        } else {
+          saveStatus.textContent = "✅ " + (data.message || "Saved.");
+          saveStatus.classList.remove("error");
+        }
+      } catch (err) {
+        console.error(err);
+        saveStatus.textContent = "Network error while saving.";
+        saveStatus.classList.add("error");
+      } finally {
+        saveBtn.disabled = false;
+      }
+    });
+  </script>
+</body>
+</html>
