@@ -7,10 +7,11 @@
 
 ## 💡 What is it?
 
-Switching tools breaks the flow.  
-Each time we pause to change a tool — to title, highlight, or box something — our rhythm breaks.  
-Those small interruptions, repeated hundreds of times, disrupt creativity.  
+Switching tools breaks the flow.  Each time we pause to change a tool — to title, highlight, or box something — our rhythm breaks.  
+Those small interruptions, repeated hundreds of times, **disrupt creativity and productivity**. 
+
 Note-taking should feel as natural as paper — only smarter.
+
 That’s why we built **✨ OnePen** — an AI-powered, handwriting-based note-taking web app that understands *how* you write.  
 
 With **AI stroke recognition**, OnePen lets you **write, format, and organize** without ever touching a toolbar.  
