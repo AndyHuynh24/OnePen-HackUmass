@@ -8,15 +8,13 @@
 ## 💡 What is it?
 
 Switching tools breaks the flow.  
+Each time we pause to change a tool — to title, highlight, or box something — our rhythm breaks.  
+Those small interruptions, repeated hundreds of times, disrupt creativity.  
+Note-taking should feel as natural as paper — only smarter.
+That’s why we built **✨ OnePen** — an AI-powered, handwriting-based note-taking web app that understands *how* you write.  
 
-To make a title, highlight, or draw a box, we stop writing, reach for a toolbar, then return — again and again.  
-It’s a small step that, repeated hundreds of times, disrupts thought and creativity.  
-
-Note-taking should feel as natural as paper — only smarter.  
-That’s why you need **OnePen**.  
-
-**OnePen** is a handwriting-based note-taking web app that uses **AI stroke recognition** to let you write, format, and organize without ever touching a toolbar.  
-You can change style your strokes, or even trigger advanced actions — all directly through how you write.
+With **AI stroke recognition**, OnePen lets you **write, format, and organize** without ever touching a toolbar.  
+Style your strokes, change colors, or trigger advanced actions — **all directly through your handwriting.**
 
 ---
 
