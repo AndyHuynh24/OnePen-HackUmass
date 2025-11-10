@@ -16,7 +16,7 @@ Note-taking should feel as natural as paper — only smarter.
 That’s why you need **OnePen**.  
 
 **OnePen** is a handwriting-based note-taking web app that uses **AI stroke recognition** to let you write, format, and organize without ever touching a toolbar.  
-You can change colors, thickness, visibility, or even trigger advanced actions — all directly through how you write.
+You can change style your strokes, or even trigger advanced actions — all directly through how you write.
 
 ---
 
